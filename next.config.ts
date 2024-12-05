@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
+module.exports = {
+  images: {
+    domains: ['anime-dandadan.com', 'cdn.myanimelist.net'], // Add all required domains here
+  },
 };
-
-export default nextConfig;
