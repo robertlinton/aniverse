@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button"
 import { PlayCircle } from 'lucide-react'
 import Image from "next/image"
 import { FavoriteButton } from '@/components/favorite-button'
+import { notFound } from 'next/navigation'
 
 async function AnimeContent({ id }: { id: string }) {
   const anime = await getAnimeById(id)
 
   if (!anime) {
-    return <div>Anime not found</div>
+    notFound()
   }
 
   return (
@@ -125,11 +126,36 @@ async function AnimeContent({ id }: { id: string }) {
   )
 }
 
-export default async function AnimePage({ params }: { params: { id: string } }) {
+export default async function AnimePage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  const { id } = await params;
   return (
     <Suspense fallback={<div>Loading anime details...</div>}>
-      <AnimeContent id={params.id} />
+      <AnimeContent id={id} />
     </Suspense>
   )
+}
+
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  const { id } = await params;
+  const anime = await getAnimeById(id);
+  
+  if (!anime) {
+    return {
+      title: 'Anime Not Found',
+    }
+  }
+
+  return {
+    title: anime.title,
+    description: anime.description,
+  }
 }
 
