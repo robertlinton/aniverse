@@ -20,9 +20,8 @@ async function AnimeContent({ id }: { id: string }) {
         <Image
           src={anime.coverImage}
           alt={`${anime.title} cover`}
-          layout="fill"
-          objectFit="cover"
-          className="brightness-50"
+          fill
+          className="brightness-50 object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
       </div>
@@ -40,6 +39,7 @@ async function AnimeContent({ id }: { id: string }) {
                   width={400}
                   height={600}
                   className="w-full"
+                  priority
                 />
               </div>
             </div>

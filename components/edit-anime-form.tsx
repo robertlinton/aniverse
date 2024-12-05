@@ -41,8 +41,8 @@ export function EditAnimeForm({ anime, onCancel, onSuccess }: EditAnimeFormProps
     setError(null)
 
     try {
-      const updatedAnime = await updateAnime(anime.id, animeData)
-      onSuccess(updatedAnime)
+      await updateAnime(anime.id, animeData)
+      onSuccess(animeData)
     } catch (err) {
       setError('Failed to update anime. Please try again.')
       console.error(err)

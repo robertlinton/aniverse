@@ -5,8 +5,7 @@ import { Anime } from '@/types/anime';
 export async function addAnime(animeData: Omit<Anime, 'id'>): Promise<string> {
   const docRef = await addDoc(collection(db, 'anime'), {
     ...animeData,
-    malId: animeData.id, // Store the MAL ID separately
-    id: undefined, // Remove the MAL ID from the main id field
+    malId: animeData.malId, // Use malId directly
   });
   return docRef.id;
 }
@@ -16,12 +15,11 @@ export async function getAllAnime(): Promise<Anime[]> {
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Anime));
 }
 
-export async function updateAnime(id: string, animeData: Omit<Anime, 'id'>): Promise<string> {
+export async function updateAnime(id: string, animeData: Omit<Anime, 'id'>): Promise<void> {
   const animeRef = doc(db, 'anime', id);
   await updateDoc(animeRef, {
     ...animeData,
-    malId: animeData.malId || animeData.id, // Ensure malId is always set
+    malId: animeData.malId, // Use malId directly
   });
-  return `Anime "${animeData.title}" updated successfully`;
 }
 
