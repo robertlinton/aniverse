@@ -125,7 +125,11 @@ async function AnimeContent({ id }: { id: string }) {
   )
 }
 
-export default function AnimePage({ params }: { params: { id: string } }) {
+interface AnimePageProps {
+  params: { id: string }
+}
+
+export default function AnimePage({ params }: AnimePageProps) {
   return (
     <Suspense fallback={<div>Loading anime details...</div>}>
       <AnimeContent id={params.id} />
