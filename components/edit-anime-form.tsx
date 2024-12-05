@@ -9,7 +9,7 @@ import { Anime } from '@/types/anime'
 interface EditAnimeFormProps {
   anime: Anime;
   onCancel: () => void;
-  onSuccess: () => void;
+  onSuccess: (updatedAnime: Omit<Anime, 'id'>) => void;
 }
 
 export function EditAnimeForm({ anime, onCancel, onSuccess }: EditAnimeFormProps) {
@@ -41,8 +41,8 @@ export function EditAnimeForm({ anime, onCancel, onSuccess }: EditAnimeFormProps
     setError(null)
 
     try {
-      await updateAnime(anime.id, animeData)
-      onSuccess()
+      const updatedAnime = await updateAnime(anime.id, animeData)
+      onSuccess(updatedAnime)
     } catch (err) {
       setError('Failed to update anime. Please try again.')
       console.error(err)

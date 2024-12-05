@@ -16,8 +16,12 @@ export async function getAllAnime(): Promise<Anime[]> {
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Anime));
 }
 
-export async function updateAnime(id: string, animeData: Omit<Anime, 'id'>): Promise<void> {
+export async function updateAnime(id: string, animeData: Omit<Anime, 'id'>): Promise<string> {
   const animeRef = doc(db, 'anime', id);
-  await updateDoc(animeRef, animeData);
+  await updateDoc(animeRef, {
+    ...animeData,
+    malId: animeData.malId || animeData.id, // Ensure malId is always set
+  });
+  return `Anime "${animeData.title}" updated successfully`;
 }
 

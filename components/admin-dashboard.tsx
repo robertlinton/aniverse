@@ -8,11 +8,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { addAnime, getAllAnime } from '@/lib/admin'
+import { addAnime, getAllAnime, updateAnime } from '@/lib/admin'
 import { Anime } from '@/types/anime'
 import { EditAnimeForm } from './edit-anime-form'
 import { Plus, Edit, Search } from 'lucide-react'
 import { searchAnime, getAnimeDetails } from '@/lib/api-utils'
+import { toast } from "@/hooks/use-toast"
 
 export function AdminDashboard() {
   const [animeList, setAnimeList] = useState<Anime[]>([])
@@ -29,11 +30,11 @@ export function AdminDashboard() {
     episodes: 0,
     genres: [],
     duration: '',
-    rating: ''
+    rating: '',
+    malId: ''
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Anime[]>([])
@@ -48,6 +49,11 @@ export function AdminDashboard() {
       setAnimeList(anime)
     } catch (err) {
       console.error('Failed to fetch anime list:', err)
+      toast({
+        title: "Error",
+        description: "Failed to fetch anime list. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -70,11 +76,13 @@ export function AdminDashboard() {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
-    setSuccess(null)
 
     try {
       const id = await addAnime(animeData)
-      setSuccess(`Anime added successfully with ID: ${id}`)
+      toast({
+        title: "Success",
+        description: `Anime added successfully with ID: ${id}`,
+      })
       setAnimeData({
         title: '',
         description: '',
@@ -87,13 +95,18 @@ export function AdminDashboard() {
         episodes: 0,
         genres: [],
         duration: '',
-        rating: ''
+        rating: '',
+        malId: ''
       })
       fetchAnimeList()
       setIsAddDialogOpen(false)
     } catch (err) {
-      setError('Failed to add anime. Please try again.')
-      console.error(err)
+      console.error('Failed to add anime:', err)
+      toast({
+        title: "Error",
+        description: "Failed to add anime. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -108,7 +121,11 @@ export function AdminDashboard() {
       setSearchResults(results)
     } catch (err) {
       console.error('Failed to search anime:', err)
-      setError('Failed to search anime. Please try again.')
+      toast({
+        title: "Error",
+        description: "Failed to search anime. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -117,14 +134,40 @@ export function AdminDashboard() {
   const handleSelectAnime = async (anime: Anime) => {
     setIsLoading(true)
     try {
-      const details = await getAnimeDetails(anime.malId)
+      const details = await getAnimeDetails(anime.malId || '')
       if (details) {
         setAnimeData(details)
         setIsAddDialogOpen(true)
       }
     } catch (err) {
       console.error('Failed to get anime details:', err)
-      setError('Failed to get anime details. Please try again.')
+      toast({
+        title: "Error",
+        description: "Failed to get anime details. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleUpdateAnime = async (id: string, updatedData: Omit<Anime, 'id'>) => {
+    setIsLoading(true)
+    try {
+      const message = await updateAnime(id, updatedData)
+      toast({
+        title: "Success",
+        description: message,
+      })
+      fetchAnimeList()
+      setEditingAnime(null)
+    } catch (err) {
+      console.error('Failed to update anime:', err)
+      toast({
+        title: "Error",
+        description: "Failed to update anime. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
@@ -216,9 +259,128 @@ export function AdminDashboard() {
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleSubmit} className="space-y-4">
-                    {/* Form fields (unchanged) */}
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Title</Label>
+                      <Input
+                        id="title"
+                        name="title"
+                        value={animeData.title}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea
+                        id="description"
+                        name="description"
+                        value={animeData.description}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="image">Thumbnail Image URL</Label>
+                      <Input
+                        id="image"
+                        name="image"
+                        value={animeData.image}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="coverImage">Cover Image URL</Label>
+                      <Input
+                        id="coverImage"
+                        name="coverImage"
+                        value={animeData.coverImage}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="format">Format</Label>
+                      <Input
+                        id="format"
+                        name="format"
+                        value={animeData.format}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="status">Status</Label>
+                      <Input
+                        id="status"
+                        name="status"
+                        value={animeData.status}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="releaseDate">Release Date</Label>
+                      <Input
+                        id="releaseDate"
+                        name="releaseDate"
+                        value={animeData.releaseDate}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="episodes">Number of Episodes</Label>
+                      <Input
+                        id="episodes"
+                        name="episodes"
+                        type="number"
+                        value={animeData.episodes}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="genres">Genres (comma-separated)</Label>
+                      <Input
+                        id="genres"
+                        name="genres"
+                        value={animeData.genres.join(', ')}
+                        onChange={handleGenresChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="duration">Episode Duration</Label>
+                      <Input
+                        id="duration"
+                        name="duration"
+                        value={animeData.duration}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="rating">Rating</Label>
+                      <Input
+                        id="rating"
+                        name="rating"
+                        value={animeData.rating}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="isFeatured"
+                        name="isFeatured"
+                        checked={animeData.isFeatured}
+                        onChange={handleCheckboxChange}
+                      />
+                      <Label htmlFor="isFeatured">Featured Anime</Label>
+                    </div>
                     {error && <p className="text-red-500 text-sm">{error}</p>}
-                    {success && <p className="text-green-500 text-sm">{success}</p>}
                     <Button type="submit" disabled={isLoading}>
                       {isLoading ? 'Adding...' : 'Add Anime'}
                     </Button>
@@ -235,13 +397,15 @@ export function AdminDashboard() {
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>Edit Anime: {editingAnime.title}</DialogTitle>
+              <DialogDescription>
+                Make changes to the anime details below. Click save when you're done.
+              </DialogDescription>
             </DialogHeader>
             <EditAnimeForm
               anime={editingAnime}
               onCancel={() => setEditingAnime(null)}
-              onSuccess={() => {
-                setEditingAnime(null)
-                fetchAnimeList()
+              onSuccess={(updatedAnime) => {
+                handleUpdateAnime(editingAnime.id, updatedAnime)
               }}
             />
           </DialogContent>

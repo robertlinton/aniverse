@@ -1,5 +1,6 @@
 export interface Anime {
   id: string;
+  malId?: string;
   title: string;
   description: string;
   image: string;
