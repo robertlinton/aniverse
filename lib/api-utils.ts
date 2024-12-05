@@ -7,8 +7,8 @@ export async function searchAnime(query: string): Promise<Anime[]> {
   const data = await response.json()
 
   return data.data.map((item: any) => ({
-    id: '', // This will be set by Firestore
-    malId: item.mal_id.toString(),
+    id: '', // This will be filled by Firestore
+    malId: item.mal_id.toString(), // Store MAL ID separately
     title: item.title,
     description: item.synopsis,
     image: item.images.jpg.image_url,
@@ -24,8 +24,8 @@ export async function searchAnime(query: string): Promise<Anime[]> {
   }))
 }
 
-export async function getAnimeDetails(id: string): Promise<Anime | null> {
-  const response = await fetch(`${JIKAN_API_BASE_URL}/anime/${id}/full`)
+export async function getAnimeDetails(malId: string): Promise<Anime | null> {
+  const response = await fetch(`${JIKAN_API_BASE_URL}/anime/${malId}/full`)
   const data = await response.json()
 
   if (!data.data) {
@@ -34,8 +34,8 @@ export async function getAnimeDetails(id: string): Promise<Anime | null> {
 
   const item = data.data
   return {
-    id: '', // This will be set by Firestore
-    malId: item.mal_id.toString(),
+    id: '', // This will be filled by Firestore
+    malId: item.mal_id.toString(), // Store MAL ID separately
     title: item.title,
     description: item.synopsis,
     image: item.images.jpg.image_url,

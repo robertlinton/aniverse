@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { getFeaturedAnime, getAnimeByCategory } from '@/lib/firestore'
+import { getFeaturedAnime, getPopularAnime } from '@/lib/firestore'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { PlayCircle } from 'lucide-react'
@@ -36,9 +36,7 @@ async function FeaturedAnime() {
 }
 
 async function PopularAnime() {
-  const tvSeries = await getAnimeByCategory('tv', 3)
-  const movies = await getAnimeByCategory('movie', 3)
-  const animeList = [...tvSeries, ...movies]
+  const animeList = await getPopularAnime()
 
   return (
     <section>
@@ -57,7 +55,6 @@ async function PopularAnime() {
                 />
                 <div className="p-2">
                   <h4 className="font-semibold truncate">{anime.title}</h4>
-                  <p className="text-sm text-muted-foreground">{anime.category === 'tv' ? 'TV Series' : 'Movie'}</p>
                 </div>
               </CardContent>
             </Card>
