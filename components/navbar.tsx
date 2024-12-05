@@ -1,6 +1,6 @@
 'use client'
 import { MouseEvent } from 'react'
-import { Bell, Search, User, Heart, Settings } from 'lucide-react'
+import { Bell, Search, User, Heart } from 'lucide-react'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -68,12 +68,6 @@ export default function Navbar() {
               <DropdownMenuItem>Profile</DropdownMenuItem>
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Subscriptions</DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/admin">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Admin
-                </Link>
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={handleSignOut}>
                 Log out

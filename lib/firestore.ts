@@ -1,9 +1,11 @@
-import { collection, getDocs, doc, getDoc, query, where, limit, setDoc, deleteDoc, arrayUnion, arrayRemove, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, getDoc, query, where, limit, arrayUnion, arrayRemove, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { Anime } from '@/types/anime';
 
+const ANIME_COLLECTION = 'anime';
+
 export async function getFeaturedAnime(): Promise<Anime | null> {
-  const q = query(collection(db, 'anime'), where('isFeatured', '==', true), limit(1));
+  const q = query(collection(db, ANIME_COLLECTION), where('isFeatured', '==', true), limit(1));
   const querySnapshot = await getDocs(q);
   
   if (querySnapshot.empty) {
@@ -15,14 +17,14 @@ export async function getFeaturedAnime(): Promise<Anime | null> {
 }
 
 export async function getPopularAnime(limitCount: number = 6): Promise<Anime[]> {
-  const q = query(collection(db, 'anime'), where('isFeatured', '==', false), limit(limitCount));
+  const q = query(collection(db, ANIME_COLLECTION), where('isFeatured', '==', false), limit(limitCount));
   const querySnapshot = await getDocs(q);
   
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Anime));
 }
 
 export async function getAnimeById(id: string): Promise<Anime | null> {
-  const docRef = doc(db, 'anime', id);
+  const docRef = doc(db, ANIME_COLLECTION, id);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
